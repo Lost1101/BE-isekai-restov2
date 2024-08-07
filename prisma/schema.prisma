@@ -12,3 +12,10 @@ model Menu {
   nama  String
   harga Float
 }
+
+model User {
+  id    Int    @id @default(autoincrement())
+  username String
+  email String
+  password String
+}
