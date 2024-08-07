@@ -113,11 +113,11 @@ app.get('/menu', async (req, res) => {
 
 app.put('/menu/:id', async (req, res) => {
   const { id } = req.params;
-  const { nama, harga } = req.body;
+  const { nama, harga, waktu, desc } = req.body;
   try {
     const menu = await prisma.menu.update({
       where: { id: parseInt(id) },
-      data: { nama, harga },
+      data: { nama, harga, waktu, desc },
     });
     res.json(menu);
   } catch (error) {
@@ -134,6 +134,35 @@ app.delete('/menu/:id', async (req, res) => {
     res.json(menu);
   } catch (error) {
     res.status(500).json({ error: 'Something went wrong' });
+  }
+});
+
+app.post('/checkout', async (req, res) => {
+  const { orderItems, totalCash } = req.body;
+  
+  if (!orderItems || orderItems.length === 0 || totalCash == null) {
+      return res.status(400).json({ message: 'Invalid order data' });
+  }
+
+  try {
+      const createdOrder = await prisma.order.create({
+          data: {
+              totalCash,
+              items: {
+                  create: orderItems.map(item => ({
+                      menuId: item.id,
+                      nama: item.nama,
+                      harga: item.harga,
+                      jumlah: item.jml
+                  }))
+              }
+          }
+      });
+
+      res.status(200).json({ message: 'Order successful', order: createdOrder });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Order failed', error: error.message });
   }
 });
 

@@ -11,6 +11,8 @@ model Menu {
   id    Int    @id @default(autoincrement())
   nama  String
   harga Float
+  waktu Int
+  desc  String @db.Text
 }
 
 model User {
@@ -18,4 +20,23 @@ model User {
   username String
   email String
   password String
+}
+
+model Order {
+  id        Int         @id @default(autoincrement())
+  totalCash Float
+  items     OrderItem[]
+  createdAt DateTime    @default(now())
+}
+
+model OrderItem {
+  id       Int    @id @default(autoincrement())
+  orderId  Int
+  menuId   Int
+  nama     String
+  harga    Float
+  jumlah   Int
+  Order    Order @relation(fields: [orderId], references: [id])
+
+  @@index([orderId])
 }
